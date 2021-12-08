@@ -7,10 +7,6 @@ export class ProviderKeeper implements Provider {
     public user: UserData | null = null;
     private readonly _authData: WavesKeeper.IAuthData;
     private _api!: WavesKeeper.TWavesKeeperApi;
-    private _options: ConnectOptions = {
-        NETWORK_BYTE: 'W'.charCodeAt(0),
-        NODE_URL: 'https://nodes.wavesnodes.com',
-    };
     private readonly _emitter: EventEmitter<AuthEvents> = new EventEmitter<AuthEvents>();
 
     constructor(authData: WavesKeeper.IAuthData) {
@@ -36,15 +32,29 @@ export class ProviderKeeper implements Provider {
     }
 
     public connect(options: ConnectOptions): Promise<void> {
-        this._options = options;
-
         const poll = (resolve) => {
             if (!!window.WavesKeeper) {
-                resolve(
-                    window.WavesKeeper.initialPromise.then((api) => {
-                        this._api = api;
-                    })
-                );
+                window.WavesKeeper.initialPromise.then((api) => {
+                    this._api = api;
+                    window.WavesKeeper.publicState().then((state) => {
+                        const stateNetworkServer = state.network.server;
+                        const stateNetworkByte = state.network.code.charCodeAt(0);
+                        if (options.NODE_URL !== stateNetworkServer || options.NETWORK_BYTE !== stateNetworkByte) {
+                            throw new Error(
+                                `Invalid connect options. Signer connect (${options.NODE_URL} ${options.NETWORK_BYTE}) not equals keeper connect (${stateNetworkServer} ${stateNetworkByte})`
+                            );
+                        }
+
+                        if (state.account) {
+                            this.user = {
+                                address: state.account.address,
+                                publicKey: state.account.publicKey,
+                            };
+                            this._emitter.trigger('login', this.user);
+                        }
+                        resolve();
+                    });
+                });
             } else setTimeout((_) => poll(resolve), 100);
         };
 
