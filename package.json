@@ -1,7 +1,7 @@
 {
   "name": "@defihelper/provider-keeper",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.4",
   "scripts": {
     "provider:test": "npm run test -workspace=provider",
     "provider:coverage": "npm run coverage -workspace=provider",

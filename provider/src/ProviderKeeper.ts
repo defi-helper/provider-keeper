@@ -26,7 +26,7 @@ export class ProviderKeeper implements Provider {
     }
 
     public off<EVENT extends keyof AuthEvents>(event: EVENT, handler: Handler<AuthEvents[EVENT]>): Provider {
-        this._emitter.once(event, handler);
+        this._emitter.off(event, handler);
 
         return this;
     }
