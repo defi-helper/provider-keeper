@@ -76,8 +76,14 @@ export class ProviderKeeper implements Provider {
     public signMessage(data: string | number): Promise<string> {
         return this._api
             .signCustomData({
-                version: 1,
-                binary: 'base64:' + base64Encode(stringToBytes(String(data))),
+                version: 2,
+                data: [
+                    {
+                        type: 'string',
+                        key: 'name',
+                        value: String(data),
+                    },
+                ],
             })
             .then((data) => data.signature);
     }
