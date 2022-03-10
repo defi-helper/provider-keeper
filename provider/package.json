@@ -1,6 +1,6 @@
 {
   "name": "@defihelper/provider-keeper",
-  "version": "0.1.4-dfh",
+  "version": "0.1.5-dfh",
   "description": "ProviderKeeper for Signer",
   "keywords": [
     "signer",
